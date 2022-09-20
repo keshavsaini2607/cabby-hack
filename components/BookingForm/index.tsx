@@ -2,6 +2,7 @@ import React, { FormEvent, useState } from "react";
 import FormButton from "../button/FormButton";
 import RideTile from "./RideTile";
 import { BiArrowBack } from "react-icons/bi";
+import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 
 const formSteps = {
    step1: {
@@ -34,6 +35,11 @@ const rideOptions = [
 ];
 
 const BookingForm: React.FC = () => {
+   const { isLoaded } = useJsApiLoader({
+      googleMapsApiKey: "AIzaSyBk6KCBbjo2Fo6K29huI8utZc9348sO2t8",
+      libraries: ["places"],
+   });
+
    const [currentStep, setCurrentStep] = useState(1);
    const [selectedRide, setSelectedRide] = useState("");
 
@@ -46,6 +52,9 @@ const BookingForm: React.FC = () => {
       setCurrentStep(1);
       setSelectedRide("");
    };
+   if (!isLoaded) {
+      return <h1>Loading...</h1>;
+   }
 
    return (
       <div>
@@ -62,13 +71,15 @@ const BookingForm: React.FC = () => {
             {currentStep === 1 ? (
                formSteps.step1.fields.map((field) => (
                   <div key={field.title} className="relative">
-                     <input
-                        key={field.title}
-                        name={field.title}
-                        placeholder={field.placeHolder}
-                        type={field.type}
-                        className="form__input"
-                     />
+                     <Autocomplete>
+                        <input
+                           key={field.title}
+                           name={field.title}
+                           placeholder={field.placeHolder}
+                           type={field.type}
+                           className="form__input"
+                        />
+                     </Autocomplete>
                      <div className="hidden p-10 bg-red-500 absolute -bottom-20 left-0 z-10 w-full"></div>
                   </div>
                ))

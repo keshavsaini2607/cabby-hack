@@ -33,10 +33,11 @@ const Login: NextPage = () => {
             <span className="mt-4 justify-end">
                <p className="flex space-x-3">
                   New here ?{" "}
-                  <Link href="/signup">
-                     <p className="ml-2 cursor-pointer border-b-[1px] font-bold border-b-heading">
-                        Create free account
-                     </p>
+                  <Link
+                     href="/signup"
+                     className="ml-2 cursor-pointer border-b-[1px] font-bold border-b-heading"
+                  >
+                     Create free account
                   </Link>
                </p>
             </span>
