@@ -1,11 +1,27 @@
 import { NextPage } from "next";
 import Image from "next/image";
-import React from "react";
+import React, { FormEvent } from "react";
 import FormButton from "../components/button/FormButton";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
+import { createUser } from "./api/auth";
 
 const Signup: NextPage = () => {
+   const handleSubmit = async (e: any) => {
+      try {
+         e.preventDefault();
+         const name = e?.target[0].value;
+         const email = e?.target[1].value;
+         const password = e?.target[2].value;
+
+         const result = await createUser(email, password);
+         console.log("result", result);
+
+      } catch (error) {
+         console.log("something went wrong");
+      }
+   };
+
    return (
       <div className="bg-primary h-screen flex justify-center items-center">
          <div className="w-[35%] flex flex-col items-center">
@@ -17,19 +33,24 @@ const Signup: NextPage = () => {
                   alt="logo"
                />
             </div>
-            <form className="flex flex-col space-y-5 w-[90%]">
+            <form className="flex flex-col space-y-5 w-[90%]" onSubmit={handleSubmit}>
                <input
                   type="text"
+                  name="fullname"
                   placeholder="Full Name"
                   className="form__input"
                />
                <input
                   type="email"
+                  name="email"
+                  id="email"
                   placeholder="Email"
                   className="form__input"
                />
                <input
                   type="password"
+                  name="password"
+                  id="password"
                   placeholder="Password"
                   className="form__input"
                />

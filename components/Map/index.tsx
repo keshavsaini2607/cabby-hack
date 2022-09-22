@@ -1,26 +1,56 @@
-import React, { useEffect, useState } from "react";
-import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
+import React, { useContext, useEffect, useState } from "react";
+import {
+   useJsApiLoader,
+   GoogleMap,
+   Marker,
+   DirectionsRenderer,
+} from "@react-google-maps/api";
 import { BiCurrentLocation } from "react-icons/bi";
 import Image from "next/image";
+import { AppContext } from "../../shared/appContext";
+import Geocode from "react-geocode";
 
 const Map: React.FC = () => {
+   Geocode.setApiKey(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!);
+   const { isLoaded } = useJsApiLoader({
+      googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+      libraries: ["places"],
+   });
+   const {
+      state: { directionsResult },
+      dispatch,
+   } = useContext(AppContext);
    const [center, setCenter] = useState<any>(null);
    const [currentLocation, setCurrentLocation] = useState<any>(null);
    const [map, setMap] = useState<any>(null);
-   const { isLoaded } = useJsApiLoader({
-      googleMapsApiKey: "AIzaSyBk6KCBbjo2Fo6K29huI8utZc9348sO2t8",
-      libraries: ["places"],
-   });
 
    useEffect(() => {
-      navigator.geolocation.getCurrentPosition(
-         ({ coords: { latitude: lat, longitude: lng } }) => {
-            const pos = { lat, lng };
-            setCurrentLocation(pos);
-            setCenter(pos);
+      (async () => {
+         if (!currentLocation) {
+            navigator.geolocation.getCurrentPosition(
+               ({ coords: { latitude: lat, longitude: lng } }) => {
+                  const pos = { lat, lng };
+                  setCurrentLocation(pos);
+                  setCenter(pos);
+               }
+            );
          }
-      );
-   }, []);
+         if (currentLocation) {
+            Geocode.fromLatLng(currentLocation?.lat, currentLocation?.lng).then(
+               (response) => {
+                  const address = response.results[0].formatted_address;
+                  dispatch({
+                     type: "SET_CURRENT_ADDRESS",
+                     payload: address,
+                  });
+               },
+               (error) => {
+                  console.error(error);
+               }
+            );
+         }
+      })();
+   }, [currentLocation]);
 
    if (!isLoaded) {
       return <h1>Loading Map...</h1>;
@@ -38,7 +68,10 @@ const Map: React.FC = () => {
          }}
          onLoad={(map) => setMap(map)}
       >
-         <Marker position={center} />
+         {!directionsResult && <Marker position={center} />}
+         {directionsResult && (
+            <DirectionsRenderer directions={directionsResult} />
+         )}
          <div
             className="p-2 bg-primary absolute top-0 left-0 cursor-pointer rounded-br-lg shadow-lg"
             onClick={() => map.panTo(currentLocation)}

@@ -1,17 +1,16 @@
-import React, { FormEvent, useState } from "react";
+import React, {
+   FormEvent,
+   useContext,
+   useEffect,
+   useRef,
+   useState,
+} from "react";
 import FormButton from "../button/FormButton";
 import RideTile from "./RideTile";
 import { BiArrowBack } from "react-icons/bi";
 import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
-
-const formSteps = {
-   step1: {
-      fields: [
-         { title: "source", placeHolder: "Source", type: "text" },
-         { title: "destination", type: "text", placeHolder: "Destination" },
-      ],
-   },
-};
+import { AppContext } from "../../shared/appContext";
+import {HiLocationMarker} from 'react-icons/hi';
 
 const rideOptions = [
    {
@@ -36,17 +35,65 @@ const rideOptions = [
 
 const BookingForm: React.FC = () => {
    const { isLoaded } = useJsApiLoader({
-      googleMapsApiKey: "AIzaSyBk6KCBbjo2Fo6K29huI8utZc9348sO2t8",
+      googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
       libraries: ["places"],
    });
-
+   const {
+      state: { currentAddress },
+      dispatch,
+   } = useContext(AppContext);
    const [currentStep, setCurrentStep] = useState(1);
    const [selectedRide, setSelectedRide] = useState("");
 
-   const handleSubmit = (e: FormEvent) => {
+   const sourceRef = useRef() as React.MutableRefObject<HTMLInputElement>;
+   const destinationRef = useRef() as React.MutableRefObject<HTMLInputElement>;
+
+   console.log({ currentAddress });
+
+   useEffect(() => {
+      dispatch({
+         type: "SET_RIDE",
+         payload: selectedRide,
+      });
+   }, [selectedRide]);
+
+   async function calculateRoute(e: any) {
       e.preventDefault();
-      setCurrentStep(2);
-   };
+      try {
+         if (
+            sourceRef.current.value === "" ||
+            destinationRef.current?.value === ""
+         ) {
+            return;
+         }
+
+         const directionsService = new google.maps.DirectionsService();
+
+         const results = await directionsService.route({
+            origin: sourceRef.current.value,
+            destination: destinationRef.current.value,
+            travelMode: google.maps.TravelMode.DRIVING,
+         });
+
+         dispatch({
+            type: "SET_DIRECTIONS_RESPONSE",
+            payload: results,
+         });
+         dispatch({
+            type: "SET_DISTANCE",
+            payload: results.routes[0].legs[0].distance?.text,
+         });
+         dispatch({
+            type: "SET_DURATION",
+            payload: results.routes[0].legs[0].duration?.text,
+         });
+         setCurrentStep(2);
+      } catch (error) {
+         alert("No ride available");
+         sourceRef.current.value = "";
+         destinationRef.current.value = "";
+      }
+   }
 
    const resetForm = () => {
       setCurrentStep(1);
@@ -60,7 +107,7 @@ const BookingForm: React.FC = () => {
       <div>
          <form
             className="mt-10 flex flex-col space-y-10"
-            onSubmit={handleSubmit}
+            onSubmit={calculateRoute}
          >
             <span className="flex items-center">
                {currentStep === 2 && (
@@ -69,20 +116,34 @@ const BookingForm: React.FC = () => {
                <span className="ml-2">Step {currentStep} / 2</span>
             </span>
             {currentStep === 1 ? (
-               formSteps.step1.fields.map((field) => (
-                  <div key={field.title} className="relative">
-                     <Autocomplete>
+               <>
+                  <Autocomplete>
+                     <div>
                         <input
-                           key={field.title}
-                           name={field.title}
-                           placeholder={field.placeHolder}
-                           type={field.type}
+                           key="source"
+                           name="source"
+                           placeholder="Source"
                            className="form__input"
+                           ref={sourceRef}
                         />
-                     </Autocomplete>
-                     <div className="hidden p-10 bg-red-500 absolute -bottom-20 left-0 z-10 w-full"></div>
-                  </div>
-               ))
+                        <span className="flex items-center justify-end mt-[1px]" onClick={() => {
+                           sourceRef.current.value = currentAddress
+                        }}>
+                           <HiLocationMarker className="text-blue-600" />
+                           <p className="text-blue-600 cursor-pointer text-sm ml-1">Use my location</p>
+                        </span>
+                     </div>
+                  </Autocomplete>
+                  <Autocomplete>
+                     <input
+                        key="destination"
+                        name="destination"
+                        placeholder="Destination"
+                        className="form__input"
+                        ref={destinationRef}
+                     />
+                  </Autocomplete>
+               </>
             ) : (
                <div>
                   <span>Select Your Ride</span>
