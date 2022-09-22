@@ -1,9 +1,22 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useContext } from "react";
+import { AiOutlineClose } from "react-icons/ai";
 import BookingForm from "../components/BookingForm";
 import Map from "../components/Map";
+import { AppContext } from "../shared/appContext";
 
 const Home: NextPage = () => {
+   const {
+      state: { showRides, rides }, dispatch
+   } = useContext(AppContext);
+
+   const toggleRideHistory = () => {
+      dispatch({
+         type: "SET_SHOW_RIDES",
+         payload: !showRides
+      })
+   }
    return (
       <div className="bg-primary h-screen flex">
          <Head>
@@ -14,22 +27,51 @@ const Home: NextPage = () => {
          <div className="w-[50%] bg-gray-500 h-full">
             <Map />
          </div>
-         <div className="w-[50%] bg-gray-100 h-full">
-            <div className="p-10">
-               <div className="flex items-center justify-between">
-                  <div>
-                     <h1 className="text-2xl font-bold">Hi, Jhon Doe</h1>
-                     <p className="tracking-wider">
-                        Book your new ride with us 🚖
-                     </p>
+         {!showRides ? (
+            <div className="w-[50%] bg-gray-100 h-full">
+               <div className="p-10">
+                  <div className="flex items-center justify-between">
+                     <div>
+                        <h1 className="text-2xl font-bold">Hi, Jhon Doe</h1>
+                        <p className="tracking-wider">
+                           Book your new ride with us 🚖
+                        </p>
+                     </div>
+                     <span className="text-blue-700 font-bold cursor-pointer" onClick={toggleRideHistory}>
+                        Ride History
+                     </span>
                   </div>
-                  <span className="text-blue-700 font-bold cursor-pointer">
-                     Ride History
-                  </span>
+                  <BookingForm />
                </div>
-               <BookingForm />
             </div>
-         </div>
+         ) : (
+            <div className="w-[50%] bg-gray-100 h-full">
+               <div className="p-10">
+                  <div className="flex items-center justify-between">
+                     <div>
+                        <h1 className="text-2xl font-bold">{`Jhon Doe's Travel History`}</h1>
+                     </div>
+                     <span className="text-black font-bold cursor-pointer" onClick={toggleRideHistory}>
+                        <AiOutlineClose size="25px" />
+                     </span>
+                  </div>
+                  <div>
+                     {
+                        rides.map((ride) => (
+                           <div key={ride.finalPrice} className="text-sm flex flex-col bg-yellow-100 p-3 space-y-[1px] mt-4">
+                              <span>Dated: {ride.dateTravelled}</span>
+                              <p>Source: {ride.start}</p>
+                              <p>Destination: {ride.end}</p>
+                              <p>Distance Travelled: {ride.distance}</p>
+                              <p>Trip Duration: {ride.duration}</p>
+                              <p>Trip Fare: {ride.finalPrice}</p>
+                           </div>
+                        ))
+                     }
+                  </div>
+               </div>
+            </div>
+         )}
       </div>
    );
 };

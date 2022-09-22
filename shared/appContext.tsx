@@ -8,7 +8,8 @@ type AppState = {
    ride: any;
    currentAddress: string;
    currentIP: string;
-   rides: any[]
+   rides: any[];
+   showRides: Boolean;
 }
 type Action =
    | { type: "SET_DIRECTIONS_RESPONSE"; payload: any }
@@ -18,6 +19,7 @@ type Action =
    | { type: "SET_CURRENT_ADDRESS"; payload: any }
    | { type: "SET_CURRENT_IP"; payload: any }
    | { type: "SET_RIDES"; payload: any }
+   | { type: "SET_SHOW_RIDES"; payload: Boolean }
 
 interface AppProviderProps {
    children: React.ReactNode;
@@ -30,7 +32,8 @@ const initialState = {
    ride: null,
    currentAddress: "",
    currentIP: "",
-   rides: []
+   rides: [],
+   showRides: false,
 };
 
 export const AppContext = createContext<{
@@ -80,6 +83,12 @@ const reducer = (state: AppState, action: Action) => {
          return {
             ...state,
             rides: [...state.rides, action.payload],
+         };
+      }
+      case "SET_SHOW_RIDES": {
+         return {
+            ...state,
+            showRides: action.payload,
          };
       }
       default:
