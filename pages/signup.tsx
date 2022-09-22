@@ -4,7 +4,6 @@ import React, { FormEvent } from "react";
 import FormButton from "../components/button/FormButton";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
-import { createUser } from "./api/auth";
 
 const Signup: NextPage = () => {
    const handleSubmit = async (e: any) => {
@@ -14,8 +13,6 @@ const Signup: NextPage = () => {
          const email = e?.target[1].value;
          const password = e?.target[2].value;
 
-         const result = await createUser(email, password);
-         console.log("result", result);
 
       } catch (error) {
          console.log("something went wrong");

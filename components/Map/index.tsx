@@ -9,6 +9,7 @@ import { BiCurrentLocation } from "react-icons/bi";
 import Image from "next/image";
 import { AppContext } from "../../shared/appContext";
 import Geocode from "react-geocode";
+import axios from "axios";
 
 const Map: React.FC = () => {
    Geocode.setApiKey(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!);
@@ -17,12 +18,26 @@ const Map: React.FC = () => {
       libraries: ["places"],
    });
    const {
-      state: { directionsResult },
+      state: { directionsResult, rides },
       dispatch,
    } = useContext(AppContext);
    const [center, setCenter] = useState<any>(null);
    const [currentLocation, setCurrentLocation] = useState<any>(null);
    const [map, setMap] = useState<any>(null);
+
+   console.log({rides})
+
+   useEffect(() => {
+      (async () => {
+         const res = await axios.get("https://geolocation-db.com/json/");
+         console.log(res);
+         // setIP(res.data.IPv4);
+         dispatch({
+            type: "SET_CURRENT_IP",
+            payload: res.data.IPv4
+         })
+      })();
+   }, []);
 
    useEffect(() => {
       (async () => {
@@ -35,6 +50,7 @@ const Map: React.FC = () => {
                }
             );
          }
+
          if (currentLocation) {
             Geocode.fromLatLng(currentLocation?.lat, currentLocation?.lng).then(
                (response) => {

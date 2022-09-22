@@ -1,13 +1,23 @@
 import * as React from "react";
 import { createContext, useContext, useReducer } from "react";
 
-type AppState = typeof initialState;
+type AppState = {
+   directionsResult: any;
+   distance: any;
+   duration: any;
+   ride: any;
+   currentAddress: string;
+   currentIP: string;
+   rides: any[]
+}
 type Action =
    | { type: "SET_DIRECTIONS_RESPONSE"; payload: any }
    | { type: "SET_DISTANCE"; payload: any }
    | { type: "SET_DURATION"; payload: any }
    | { type: "SET_RIDE"; payload: any }
-   | { type: "SET_CURRENT_ADDRESS"; payload: any };
+   | { type: "SET_CURRENT_ADDRESS"; payload: any }
+   | { type: "SET_CURRENT_IP"; payload: any }
+   | { type: "SET_RIDES"; payload: any }
 
 interface AppProviderProps {
    children: React.ReactNode;
@@ -17,8 +27,10 @@ const initialState = {
    directionsResult: null,
    distance: null,
    duration: null,
-   ride: "",
-   currentAddress: ""
+   ride: null,
+   currentAddress: "",
+   currentIP: "",
+   rides: []
 };
 
 export const AppContext = createContext<{
@@ -56,6 +68,18 @@ const reducer = (state: AppState, action: Action) => {
          return {
             ...state,
             currentAddress: action.payload,
+         };
+      }
+      case "SET_CURRENT_IP": {
+         return {
+            ...state,
+            currentIP: action.payload,
+         };
+      }
+      case "SET_RIDES": {
+         return {
+            ...state,
+            rides: [...state.rides, action.payload],
          };
       }
       default:
