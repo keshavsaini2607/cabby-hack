@@ -11,6 +11,7 @@
   "dependencies": {
     "@react-google-maps/api": "^2.12.2",
     "@types/react-geocode": "^0.2.1",
+    "@types/react-time-picker": "^4.0.2",
     "axios": "^0.27.2",
     "firebase": "^9.10.0",
     "google-map-react": "^2.2.0",
@@ -21,7 +22,8 @@
     "react-geocode": "^0.2.3",
     "react-google-maps": "^9.4.5",
     "react-icons": "^4.4.0",
-    "react-spinkit": "^3.0.0"
+    "react-spinkit": "^3.0.0",
+    "react-time-picker": "^5.0.0"
   },
   "devDependencies": {
     "@types/google-map-react": "^2.1.7",

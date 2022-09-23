@@ -12,6 +12,7 @@ import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 import { AppContext } from "../../shared/appContext";
 import { HiLocationMarker } from "react-icons/hi";
 import BookingConfirm from "./BookingConfirm";
+// import TimePicker from "react-time-picker";
 
 export const rideOptions = [
    {
@@ -19,21 +20,21 @@ export const rideOptions = [
       title: "SUV",
       budget: "15 INR/KM (prices might differ as per the time of the day)",
       icon: "/assets/suv.png",
-      farePerKm: 15
+      farePerKm: 15,
    },
    {
       id: "1",
       title: "Mini Car",
       budget: "12 INR/KM (prices might differ as per the time of the day)",
       icon: "/assets/mini.png",
-      farePerKm: 12
+      farePerKm: 12,
    },
    {
       id: "2",
       title: "Scooter",
       budget: "8 INR/KM (prices might differ as per the time of the day)",
       icon: "/assets/scooter.png",
-      farePerKm: 8
+      farePerKm: 8,
    },
 ];
 
@@ -48,6 +49,7 @@ const BookingForm: React.FC = () => {
    } = useContext(AppContext);
    const [currentStep, setCurrentStep] = useState(1);
    const [selectedRide, setSelectedRide] = useState("");
+   const [time, setTime] = useState("");
 
    const sourceRef = useRef() as React.MutableRefObject<HTMLInputElement>;
    const destinationRef = useRef() as React.MutableRefObject<HTMLInputElement>;
